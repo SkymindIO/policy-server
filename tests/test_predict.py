@@ -1,4 +1,12 @@
-import requests
+import ray
+from fastapi.testclient import TestClient
+
+from app import app
+from generate import CLI
+
+# Set up server
+CLI.copy_server_files("examples/mouse_and_cheese")
+client = TestClient(app)
 
 payload = {
     "mouse_row": 1,
@@ -9,15 +17,23 @@ payload = {
 
 
 def predict():
-    res = requests.post("http://localhost:8000/predict", verify=False, json=payload)
-    print(res.json())
-    return res
+    return client.post(
+        "http://localhost:8000/predict/",
+        json=payload,
+        headers={"access-token": "1234567asdfgh"},
+    )
 
 
-predict()
+def test_predict_simple():
+    res = predict()
+    assert res is not None
+    ray.shutdown()
 
 
-res = requests.get("http://localhost:8000/openapi.json")
+def test_write_openapi_json():
+    res = client.get("http://localhost:8000/openapi.json")
 
-with open("../openapi.json", "w") as f:
-    f.write(res.content.decode("utf-8"))
+    with open("../openapi.json", "w") as f:
+        f.write(res.content.decode("utf-8"))
+
+    ray.shutdown()

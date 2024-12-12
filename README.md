@@ -110,12 +110,20 @@ parameters:
   discrete: True
   tuple: False
   api_key: "1234567asdfgh"
+  project_id: 1284
+  model_id: 2817
 ```
 
 With this configuration of the policy server, the user will only have access to one predictive endpoint, namely
 `predict_raw/`, which requires users to send a JSON with the following structure `{"obs": []}` where the list elements
 have to have precisely the right cardinality and ordering. In other words, this endpoint strips all validation that
 the other endpoints have, but is quicker to set up due to not having to specify the structure of observations.
+
+Note that if `discrete` is `True` is for models with all discrete actions, while setting this flag to `False` means
+that the policy emits continuous actions.
+
+Providing `project_id` and `model_id` is optional. If you provide both, the `/docs` and `/redoc` endpoints will have
+feature a link to go back to the respective Pathmind experiment this policy came from.
 
 ### Starting the app
 

@@ -39,7 +39,8 @@ jobs:
         run: |
           pre-commit run --all-files
       - name: Test with pytest
+        # config.py won't import if schema.yaml doesn't exist yet
         run: |
-          cp examples/mouse_and_cheese/schema.yaml .
-          python generate.py copy_server_files examples/mouse_and_cheese
-          pytest tests/test_app.py
+          cp examples/lpoc/schema.yaml .
+          python generate.py copy_server_files "examples/mouse_and_cheese"
+          pytest tests/

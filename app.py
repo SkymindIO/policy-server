@@ -10,22 +10,43 @@ from fastapi.openapi.utils import get_openapi
 from fastapi.responses import FileResponse
 from fastapi.security.api_key import APIKey
 from ray import serve
-from ray.rllib.evaluation.sample_batch_builder import SampleBatchBuilder
-from ray.rllib.offline.json_writer import JsonWriter
 
 import config
 from api import Action, Observation, RawObservation
+from docs import get_redoc_html, get_swagger_ui_html
 from generate import CLI
-from offline import EpisodeCache
 from security import get_api_key
-
-cache = EpisodeCache()
-batch_builder = SampleBatchBuilder()  # or MultiAgentSampleBatchBuilder
-writer = JsonWriter(config.EXPERIENCE_LOCATION)
 
 url_path = config.parameters.get("url_path")
 
-app = FastAPI(root_path=f"/{url_path}") if url_path else FastAPI()
+app = (
+    FastAPI(root_path=f"/{url_path}", docs_url=None, redoc_url=None)
+    if url_path
+    else FastAPI(docs_url=None, redoc_url=None)
+)
+
+
+@app.get("/docs", include_in_schema=False)
+def overridden_swagger():
+    return get_swagger_ui_html(
+        openapi_url="/openapi.json",
+        title="Pathmind Policy Server",
+        swagger_favicon_url="https://www.google.com/s2/favicons?domain_url=pathmind.com",
+        project_id=config.project_id,
+        model_id=config.model_id,
+    )
+
+
+@app.get("/redoc", include_in_schema=False)
+def overridden_redoc():
+    return get_redoc_html(
+        openapi_url="/openapi.json",
+        title="Pathmind Policy Server",
+        redoc_favicon_url="https://www.google.com/s2/favicons?domain_url=pathmind.com",
+        project_id=config.project_id,
+        model_id=config.model_id,
+    )
+
 
 tags_metadata = [
     {

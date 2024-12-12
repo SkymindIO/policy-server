@@ -43,6 +43,9 @@ observations = schema.get("observations")
 parameters = schema.get("parameters")
 action_type = int if parameters.get("discrete") else float
 
+model_id = parameters.get("model_id", None)
+project_id = parameters.get("project_id", None)
+
 payload_data = {}
 # If the schema includes `max_items` set the constraints for the array
 if observations:

@@ -9,6 +9,10 @@ CLI.copy_server_files("examples/mouse_and_cheese")
 client = TestClient(app)
 
 
+def setup_function():
+    ray.shutdown()
+
+
 def test_health_check():
     response = client.get("/")
     assert response.status_code == 200
